@@ -1,8 +1,21 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "quizzle-api-worker",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-10-09"
+  "main": "src/server.ts",
+  "compatibility_date": "2025-10-09",
+  "unsafe": {
+    "bindings": [
+      {
+        "name": "SERVER_RATE_LIMITER",
+        "type": "ratelimit",
+        "namespace_id": "1001",
+        "simple": {
+          "limit": 60, // 60 requests
+          "period": 60 // 1 minute
+        }
+      }
+    ]
+  }
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
