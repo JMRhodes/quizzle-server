@@ -1,12 +1,16 @@
 import { Hono } from "hono";
+import { pinoLogger } from "hono-pino";
 
 import categories from "./categories/categories.controller";
-import { rateLimit } from "./middlewares/rate-limiter.js";
+import { rateLimiter } from "./middlewares/rate-limiter.js";
 
 const app = new Hono().basePath("/api");
 
 app
-  .use(rateLimit)
+  .use(pinoLogger()) // Log all requests
+  .use(rateLimiter); // Apply rate limiting middleware
+
+app
   .get("/", (c) => {
     return c.text("Hello Hono!");
   })

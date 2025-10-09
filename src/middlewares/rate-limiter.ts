@@ -9,7 +9,7 @@ export type AppType = {
   };
 };
 
-export const rateLimit = cloudflareRateLimiter<AppType>({
+export const rateLimiter = cloudflareRateLimiter<AppType>({
   rateLimitBinding: c => c.env.SERVER_RATE_LIMITER,
   keyGenerator: c => c.req.header("cf-connecting-ip") ?? "", // Method to generate custom identifiers for clients.
 });
