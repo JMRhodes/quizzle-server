@@ -1,0 +1,45 @@
+{
+  "name": "server",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:ui": "vitest --ui",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.3",
+    "dotenv": "^17.2.3",
+    "dotenv-expand": "^12.0.3",
+    "hono": "^4.9.10",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^5.4.1",
+    "@cloudflare/workers-types": "^4.20251008.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.4.0"
+  },
+  "lint-staged": {
+    "*": [
+      "eslint"
+    ]
+  }
+}
