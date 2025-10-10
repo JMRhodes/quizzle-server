@@ -1,4 +1,3 @@
-import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { pinoLogger } from "hono-pino";
 import { basicAuth } from "hono/basic-auth";

@@ -26,7 +26,7 @@ export default antfu(
       semi: true,
       quotes: "double",
     },
-    ignores: ["drizzle", ".husky", "node_modules", "dist", "coverage"],
+    ignores: ["drizzle", ".husky", "node_modules", "dist", "migrations"],
   },
   {
     rules: {

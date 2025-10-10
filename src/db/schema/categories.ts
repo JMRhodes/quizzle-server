@@ -5,7 +5,7 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 // Example Zod schema generation
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 
 // Categories table
 export const categories = sqliteTable("categories", {
@@ -21,3 +21,4 @@ export const categories = sqliteTable("categories", {
 
 export const insertCategorySchema = createInsertSchema(categories);
 export const selectCategorySchema = createSelectSchema(categories);
+export const updateCategorySchema = createUpdateSchema(categories);
