@@ -18,8 +18,7 @@
   },
   "vars": {
     "DB": "QUIZZLE_DB",
-    "USERNAME": "justinr",
-    "PASSWORD": "acoolproject"
+    "JWT_SECRET": "<YOUR_SECRET>"
   },
   "observability": {
     "enabled": true,
