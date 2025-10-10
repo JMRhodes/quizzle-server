@@ -16,6 +16,11 @@
       }
     ]
   },
+  "vars": {
+    "DB": "QUIZZLE_DB",
+    "USERNAME": "justinr",
+    "PASSWORD": "acoolproject"
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
