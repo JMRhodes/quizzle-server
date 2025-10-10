@@ -9,8 +9,8 @@ export default defineConfig({
   driver: "d1-http",
   dialect: "sqlite",
   dbCredentials: {
-    accountId: process.env.ACCOUNT_ID,
-    databaseId: process.env.DB_ID,
-    token: process.env.D1_TOKEN,
+    accountId: process.env.ACCOUNT_ID!,
+    databaseId: process.env.DB_ID!,
+    token: process.env.D1_TOKEN!,
   },
 });
