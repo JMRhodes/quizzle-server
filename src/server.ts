@@ -18,7 +18,7 @@ app
   .get("/", async (c) => {
     const payload = c.get("jwtPayload");
     if (payload) {
-      return c.json({ message: `Welcome back, ${payload.sub}` });
+      return c.json({ message: `Welcome back` });
     }
     return c.json({ message: "Welcome to the API" });
   })

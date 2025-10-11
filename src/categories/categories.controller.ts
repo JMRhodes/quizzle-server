@@ -1,55 +1,48 @@
 import type { Context } from "hono";
 
 import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 
 import type { Environment } from "../bindings.js";
 
-import { initDbConnect } from "../db/index.js";
-import { categories as categoriesTable, insertCategorySchema, updateCategorySchema } from "../db/schema/categories.js";
+import { insertCategorySchema, updateCategorySchema } from "../db/schema/categories.js";
+import { categoriesService } from "./categories.service";
 
 const categories = new Hono<Environment>();
 
 categories.get("/", async (c: Context<Environment>) => {
-  const db = initDbConnect(c.env.QUIZZLE_DB);
-  const result = await db.select().from(categoriesTable);
-
-  return Response.json(result);
+  const results = await categoriesService.getAllCategories(c);
+  return Response.json(results);
 });
 
 categories.get("/:id", async (c) => {
   const { id } = c.req.param();
-  const db = initDbConnect(c.env.QUIZZLE_DB);
-  const result = await db.select().from(categoriesTable).where(eq(categoriesTable.id, Number.parseInt(id)));
+  const result = await categoriesService.getCategoryById(Number.parseInt(id), c);
 
-  if (result.length === 0) {
+  if (!result) {
     return c.json({ message: "Category not found" }, 404);
   }
 
-  return c.json({ message: "Category found", category: result[0] });
+  return c.json({ message: "Category found", category: result });
 });
 
 categories.post("/", zValidator("json", insertCategorySchema), async (c) => {
-  const db = initDbConnect(c.env.QUIZZLE_DB);
-  const category = c.req.valid("json");
-  const response = await db.insert(categoriesTable).values(category);
+  const response = await categoriesService.createCategory(c.req.valid("json"), c);
 
   return c.json({ message: "Category created", response });
 });
 
 categories.put("/:id", zValidator("json", updateCategorySchema), async (c) => {
   const { id } = c.req.param();
-  const category = c.req.valid("json");
-  const db = initDbConnect(c.env.QUIZZLE_DB);
-  const response = await db.update(categoriesTable).set(category).where(eq(categoriesTable.id, Number.parseInt(id)));
+  const response = await categoriesService.updateCategory(Number.parseInt(id), c.req.valid("json"), c);
 
   return c.json({ message: "Category updated", response });
 });
 
-categories.delete("/:id", (c) => {
+categories.delete("/:id", async (c) => {
   const { id } = c.req.param();
-  return c.json({ message: `Category ${id} deleted` });
+  const response = await categoriesService.deleteCategory(Number.parseInt(id), c);
+  return c.json({ message: `Category ${id} deleted`, response });
 });
 
 export default categories;
