@@ -17,8 +17,7 @@
     ]
   },
   "vars": {
-    "DB": "QUIZZLE_DB",
-    "JWT_SECRET": "<YOUR_SECRET>"
+    "DB": "QUIZZLE_DB"
   },
   "observability": {
     "enabled": true,
