@@ -12,7 +12,9 @@ const categories = new Hono<Environment>();
 
 categories.get("/", async (c: Context<Environment>) => {
   const results = await categoriesService.getAllCategories(c);
-  return Response.json(results);
+  return c.json({
+    categories: results,
+  });
 });
 
 categories.get("/:id", async (c) => {
