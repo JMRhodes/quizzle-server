@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
 import {
-  blob,
   integer,
   sqliteTable,
   text,
@@ -13,11 +12,11 @@ export const questions = sqliteTable("questions", {
   id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   categoryId: integer("category_id").references(() => categories.id).notNull(),
   questionText: text("question_text").notNull(),
-  options: blob("options", { mode: "json" }).notNull(),
+  options: text("options", { mode: "json" }).notNull(),
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation"),
   difficulty: integer("difficulty").notNull().default(1),
-  metadata: blob("metadata", { mode: "json" }),
+  metadata: text("metadata", { mode: "json" }),
   isActive: integer({ mode: "boolean" }).notNull().default(true),
   displayOrder: integer("display_order").notNull().default(0),
   createdAt: integer({ mode: "timestamp" }).default(sql`(CURRENT_TIMESTAMP)`),

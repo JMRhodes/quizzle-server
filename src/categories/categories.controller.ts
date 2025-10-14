@@ -3,9 +3,9 @@ import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-import type { Environment, jsonApiErrorResponse, jsonApiListResponse, jsonApiResponse } from "../bindings.js";
+import type { Environment, jsonApiErrorResponse, jsonApiListResponse, jsonApiResponse } from "../bindings";
 
-import { insertCategorySchema, updateCategorySchema } from "../db/schema/categories.js";
+import { insertCategorySchema, updateCategorySchema } from "../db/schema/categories";
 import { categoriesService } from "./categories.service";
 
 const categories = new Hono<Environment>();
