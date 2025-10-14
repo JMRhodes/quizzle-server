@@ -3,18 +3,18 @@ import type { z } from "zod";
 
 import { eq } from "drizzle-orm";
 
-import type { Environment } from "../bindings.js";
-import type { insertCategorySchema, selectCategorySchema, updateCategorySchema } from "../db/schema/categories.js";
+import type { Environment } from "../bindings";
+import type { insertCategorySchema, selectCategorySchema, updateCategorySchema } from "../db/schema/categories";
 
-import { initDbConnect } from "../db/index.js";
-import { categories as categoriesTable } from "../db/schema/categories.js";
+import { initDbConnect } from "../db/index";
+import { categories as categoriesTable } from "../db/schema/categories";
 
 export const categoriesService = {
   getAllCategories: async (c: Context<Environment>): Promise<z.infer<typeof selectCategorySchema>[]> => {
     try {
       const db = initDbConnect(c.env.QUIZZLE_DB);
       const result = await db.select().from(categoriesTable);
-      return result;
+      return result as z.infer<typeof selectCategorySchema>[];
     }
     catch (error) {
       throw new Error("Failed to fetch categories", { cause: error });
@@ -24,7 +24,7 @@ export const categoriesService = {
     const db = initDbConnect(c.env.QUIZZLE_DB);
     const result = await db.select().from(categoriesTable).where(eq(categoriesTable.id, id)).limit(1);
 
-    return result[0];
+    return result[0] as z.infer<typeof selectCategorySchema>;
   },
   createCategory: async (categoryData: z.infer<typeof insertCategorySchema>, c: Context<Environment>) => {
     const db = initDbConnect(c.env.QUIZZLE_DB);

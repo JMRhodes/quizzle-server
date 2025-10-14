@@ -4,7 +4,6 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-// Example Zod schema generation
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 
 // Categories table

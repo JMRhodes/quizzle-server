@@ -4,7 +4,7 @@ import "dotenv/config";
 
 /* eslint-disable node/no-process-env */
 export default defineConfig({
-  schema: "./src/db/schema",
+  schema: "./src/db/schema/index.ts",
   out: "./migrations",
   driver: "d1-http",
   dialect: "sqlite",

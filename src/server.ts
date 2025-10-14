@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { pinoLogger } from "hono-pino";
 
-import type { Environment } from "./bindings.js";
+import type { Environment } from "./bindings";
 
 import categories from "./categories/categories.controller";
-import jwtMiddleware from "./middlewares/jwt.js";
-import { rateLimiter } from "./middlewares/rate-limiter.js";
+import jwtMiddleware from "./middlewares/jwt";
+import { rateLimiter } from "./middlewares/rate-limiter";
+import questions from "./questions/questions.controller";
 
 const app = new Hono<Environment>().basePath("/api");
 
@@ -22,6 +23,7 @@ app
     }
     return c.json({ message: "Welcome to the API" });
   })
-  .route("/categories", categories);
+  .route("/categories", categories)
+  .route("/admin/questions", questions);
 
 export default app;
