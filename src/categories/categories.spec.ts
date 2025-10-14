@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Environment } from "../bindings.js";
 
-import categories from "./categories.controller";
-import { categoriesService } from "./categories.service";
+import categories from "./categories.controller.js";
+import { categoriesService } from "./categories.service.js";
 
 // Mock the categories service
 vi.mock("./categories.service", () => ({
@@ -44,8 +44,8 @@ describe("Categories Controller", () => {
           description: "Science related questions",
           isActive: true,
           displayOrder: 0,
-          createdAt: "new Date()",
-          updatedAt: "new Date()",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           id: 2,
@@ -54,8 +54,8 @@ describe("Categories Controller", () => {
           description: "Historical questions",
           isActive: true,
           displayOrder: 1,
-          createdAt: "new Date()",
-          updatedAt: "new Date()",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -65,7 +65,9 @@ describe("Categories Controller", () => {
       const data = await res.json();
 
       expect(res.status).toBe(200);
-      expect(data).toEqual(mockCategories);
+      expect(data).toEqual({
+        categories: mockCategories,
+      });
       expect(categoriesService.getAllCategories).toHaveBeenCalledOnce();
     });
   });
@@ -79,8 +81,8 @@ describe("Categories Controller", () => {
         description: "Science related questions",
         isActive: true,
         displayOrder: 0,
-        createdAt: "new Date()",
-        updatedAt: "new Date()",
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       vi.mocked(categoriesService.getCategoryById).mockResolvedValue(mockCategory);
@@ -97,7 +99,7 @@ describe("Categories Controller", () => {
     });
 
     it("should return 404 when category not found", async () => {
-      vi.mocked(categoriesService.getCategoryById).mockResolvedValue(null);
+      vi.mocked(categoriesService.getCategoryById).mockResolvedValue(null as any);
 
       const res = await app.request("/categories/999", {}, mockEnv);
       const data = await res.json();

@@ -9,3 +9,30 @@ type Environment = Env & {
     NODE_ENV: "development" | "production";
   };
 };
+
+type jsonApiResponse = {
+  data: {
+    type: string;
+    id: number;
+    attributes: Record<string, unknown>;
+  } | null;
+  errors?: { detail: string }[];
+  meta?: Record<string, unknown>;
+};
+
+type jsonApiListResponse = {
+  data: {
+    type: string;
+    id: number;
+    attributes: Record<string, unknown>;
+  }[];
+  errors?: { detail: string }[];
+  meta?: Record<string, unknown>;
+};
+
+type jsonApiErrorResponse = {
+  id: string;
+  status: string;
+  errors: { detail: string }[];
+  meta?: Record<string, unknown>;
+};

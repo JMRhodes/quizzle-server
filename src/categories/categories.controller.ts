@@ -3,7 +3,7 @@ import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-import type { Environment } from "../bindings.js";
+import type { Environment, jsonApiErrorResponse, jsonApiListResponse, jsonApiResponse } from "../bindings.js";
 
 import { insertCategorySchema, updateCategorySchema } from "../db/schema/categories.js";
 import { categoriesService } from "./categories.service";
@@ -13,8 +13,12 @@ const categories = new Hono<Environment>();
 categories.get("/", async (c: Context<Environment>) => {
   const results = await categoriesService.getAllCategories(c);
   return c.json({
-    categories: results,
-  });
+    data: results.map(category => ({
+      type: "categories",
+      id: category.id,
+      attributes: { ...category, id: undefined },
+    })),
+  } as jsonApiListResponse);
 });
 
 categories.get("/:id", async (c) => {
@@ -22,10 +26,21 @@ categories.get("/:id", async (c) => {
   const result = await categoriesService.getCategoryById(Number.parseInt(id), c);
 
   if (!result) {
-    return c.json({ message: "Category not found" }, 404);
+    return c.json({
+      id: "not_found",
+      status: "404",
+      errors: [{ detail: `Category with id ${id} not found` }],
+      meta: {},
+    } as jsonApiErrorResponse, 404);
   }
 
-  return c.json({ message: "Category found", category: result });
+  return c.json({
+    data: {
+      type: "categories",
+      id: result.id,
+      attributes: { ...result, id: undefined },
+    },
+  } as jsonApiResponse);
 });
 
 categories.post("/", zValidator("json", insertCategorySchema), async (c) => {

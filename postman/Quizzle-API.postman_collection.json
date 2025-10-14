@@ -1,0 +1,1244 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Quizzle API",
+    "description": "Comprehensive API collection for the Quizzle daily trivia server built with Hono on Cloudflare Workers.\n\n## Authentication\nThis API uses JWT authentication. Set your JWT token in the environment variables or use the auth endpoints.\n\n## Base Path\nAll endpoints are prefixed with `/api`\n\n## Rate Limiting\n- 60 requests per minute per IP address\n- Admin endpoints may have additional restrictions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Root - Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Optional JWT token for authenticated response",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                ""
+              ]
+            },
+            "description": "Basic health check endpoint that returns different messages based on authentication status."
+          },
+          "response": [
+            {
+              "name": "Unauthenticated Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Welcome to the API\"\n}"
+            },
+            {
+              "name": "Authenticated Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Welcome back\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has message property\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is acceptable\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Basic health check and API status endpoints"
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            },
+            "description": "Retrieve all trivia categories with their metadata including active status and display order."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"categories\": [\n    {\n      \"id\": 1,\n      \"name\": \"Science\",\n      \"slug\": \"science\",\n      \"description\": \"Questions about physics, chemistry, biology, and more\",\n      \"isActive\": true,\n      \"displayOrder\": 0,\n      \"createdAt\": \"2025-10-14T00:00:00.000Z\",\n      \"updatedAt\": \"2025-10-14T00:00:00.000Z\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"History\",\n      \"slug\": \"history\",\n      \"description\": \"Historical events and figures\",\n      \"isActive\": true,\n      \"displayOrder\": 1,\n      \"createdAt\": \"2025-10-14T00:00:00.000Z\",\n      \"updatedAt\": \"2025-10-14T00:00:00.000Z\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has categories array\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('categories');",
+                  "    pm.expect(jsonData.categories).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Categories have required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.categories.length > 0) {",
+                  "        const category = jsonData.categories[0];",
+                  "        pm.expect(category).to.have.property('id');",
+                  "        pm.expect(category).to.have.property('name');",
+                  "        pm.expect(category).to.have.property('slug');",
+                  "        pm.expect(category).to.have.property('isActive');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{category_id}}"
+              ]
+            },
+            "description": "Retrieve a specific category by its ID."
+          },
+          "response": [
+            {
+              "name": "Category Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/categories/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"data\": {\n    \"type\": \"categories\",\n    \"id\": 1,\n    \"attributes\": {\n      \"name\": \"Science\",\n      \"slug\": \"science\",\n      \"description\": \"Questions about physics, chemistry, biology, and more\",\n      \"isActive\": true,\n      \"displayOrder\": 0,\n      \"createdAt\": \"2025-10-14T00:00:00.000Z\",\n      \"updatedAt\": \"2025-10-14T00:00:00.000Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Category Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/categories/999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Category not found\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response follows JSON:API structure\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "        pm.expect(jsonData.data).to.have.property('type');",
+                  "        pm.expect(jsonData.data).to.have.property('id');",
+                  "        pm.expect(jsonData.data).to.have.property('attributes');",
+                  "        pm.expect(jsonData.data.type).to.equal('categories');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sports\",\n  \"slug\": \"sports\",\n  \"description\": \"Questions about various sports and athletic competitions\",\n  \"isActive\": true,\n  \"displayOrder\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            },
+            "description": "Create a new trivia category. All fields except description are required."
+          },
+          "response": [
+            {
+              "name": "Category Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sports\",\n  \"slug\": \"sports\",\n  \"description\": \"Questions about various sports and athletic competitions\",\n  \"isActive\": true,\n  \"displayOrder\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Category created\",\n  \"response\": {\n    \"success\": true,\n    \"meta\": {\n      \"changes\": 1,\n      \"last_row_id\": 3,\n      \"duration\": 0.1\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates success\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('created');",
+                  "});",
+                  "",
+                  "pm.test(\"Database operation was successful\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.response && jsonData.response.meta) {",
+                  "        pm.expect(jsonData.response.meta.changes).to.be.above(0);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sports & Athletics\",\n  \"description\": \"Questions about sports, athletics, and competitive activities\",\n  \"displayOrder\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{category_id}}"
+              ]
+            },
+            "description": "Update an existing category. Only include fields you want to change."
+          },
+          "response": [
+            {
+              "name": "Category Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sports & Athletics\",\n  \"description\": \"Questions about sports, athletics, and competitive activities\",\n  \"displayOrder\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/categories/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Category updated\",\n  \"response\": {\n    \"success\": true,\n    \"meta\": {\n      \"changes\": 1,\n      \"duration\": 0.1\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates success\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "JWT token required"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{category_id}}"
+              ]
+            },
+            "description": "Delete a category by ID. This will also affect any associated questions."
+          },
+          "response": [
+            {
+              "name": "Category Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/categories/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Category 1 deleted\",\n  \"response\": {\n    \"success\": true,\n    \"meta\": {\n      \"changes\": 1,\n      \"duration\": 0.1\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates deletion\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "CRUD operations for trivia categories",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{jwt_token}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Questions (Future)",
+      "item": [
+        {
+          "name": "Get Today's Questions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/questions/today?categories=science,history",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "questions",
+                "today"
+              ],
+              "query": [
+                {
+                  "key": "categories",
+                  "value": "science,history",
+                  "description": "Optional comma-separated list of category slugs to filter"
+                }
+              ]
+            },
+            "description": "Get all questions scheduled for today, optionally filtered by categories. This endpoint will be public (no auth required)."
+          },
+          "response": [
+            {
+              "name": "Today's Questions",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/questions/today",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "questions",
+                    "today"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"date\": \"2025-10-14\",\n  \"total_categories\": 5,\n  \"available_questions\": 4,\n  \"questions\": [\n    {\n      \"id\": 1,\n      \"category\": {\n        \"name\": \"Science\",\n        \"slug\": \"science\"\n      },\n      \"question\": \"What is the chemical symbol for gold?\",\n      \"options\": [\"Au\", \"Ag\", \"Go\", \"Gd\"],\n      \"difficulty\": \"easy\",\n      \"metadata\": {\n        \"source\": \"chemistry_basics\",\n        \"tags\": [\"chemistry\", \"elements\"]\n      }\n    }\n  ],\n  \"missing_categories\": [\"sports\"]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Question by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/questions/category/{{category_slug}}?date={{date}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "questions",
+                "category",
+                "{{category_slug}}"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{date}}",
+                  "description": "Optional date (YYYY-MM-DD), defaults to today"
+                }
+              ]
+            },
+            "description": "Get the question for a specific category and date. Public endpoint."
+          },
+          "response": [
+            {
+              "name": "Category Question",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/questions/category/science",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "questions",
+                    "category",
+                    "science"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"id\": 1,\n  \"category\": {\n    \"id\": 1,\n    \"name\": \"Science\",\n    \"slug\": \"science\"\n  },\n  \"question\": \"What is the chemical symbol for gold?\",\n  \"options\": [\"Au\", \"Ag\", \"Go\", \"Gd\"],\n  \"difficulty\": \"easy\",\n  \"date\": \"2025-10-14\",\n  \"metadata\": {\n    \"source\": \"chemistry_basics\",\n    \"tags\": [\"chemistry\", \"elements\"],\n    \"explanation\": \"Gold's chemical symbol Au comes from its Latin name 'aurum'\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": \"Au\",\n  \"user_id\": \"optional_user_identifier\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/questions/{{question_id}}/answer",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "questions",
+                "{{question_id}}",
+                "answer"
+              ]
+            },
+            "description": "Submit an answer for a question and get immediate feedback. Public endpoint with rate limiting."
+          },
+          "response": [
+            {
+              "name": "Correct Answer",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"answer\": \"Au\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/questions/1/answer",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "questions",
+                    "1",
+                    "answer"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"correct\": true,\n  \"user_answer\": \"Au\",\n  \"correct_answer\": \"Au\",\n  \"explanation\": \"Gold's chemical symbol Au comes from its Latin name 'aurum'\",\n  \"response_time_ms\": 1500\n}"
+            },
+            {
+              "name": "Incorrect Answer",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"answer\": \"Ag\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/questions/1/answer",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "questions",
+                    "1",
+                    "answer"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"correct\": false,\n  \"user_answer\": \"Ag\",\n  \"correct_answer\": \"Au\",\n  \"explanation\": \"Gold's chemical symbol Au comes from its Latin name 'aurum'. Ag is the symbol for silver.\",\n  \"response_time_ms\": 2300\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Future endpoints for question management and retrieval (not yet implemented)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Set current date if not provided",
+              "if (!pm.variables.get('date')) {",
+              "    const today = new Date().toISOString().split('T')[0];",
+              "    pm.variables.set('date', today);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Questions Management",
+          "item": [
+            {
+              "name": "List All Questions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/questions?page={{page}}&limit={{limit}}&category={{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "questions"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "{{page}}",
+                      "description": "Page number for pagination"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "{{limit}}",
+                      "description": "Number of items per page"
+                    },
+                    {
+                      "key": "category",
+                      "value": "{{category_id}}",
+                      "description": "Filter by category ID"
+                    }
+                  ]
+                },
+                "description": "Get paginated list of all questions for admin management."
+              }
+            },
+            {
+              "name": "Create Question",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category_id\": 1,\n  \"question_text\": \"What is the speed of light in vacuum?\",\n  \"options\": [\"299,792,458 m/s\", \"300,000,000 m/s\", \"186,282 miles/s\", \"All of the above\"],\n  \"correct_answer\": \"299,792,458 m/s\",\n  \"explanation\": \"The speed of light in vacuum is exactly 299,792,458 meters per second, as defined by the International System of Units.\",\n  \"difficulty\": \"medium\",\n  \"metadata\": {\n    \"source\": \"physics_fundamentals\",\n    \"tags\": [\"physics\", \"constants\", \"light\"]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/questions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "questions"
+                  ]
+                },
+                "description": "Create a new trivia question."
+              }
+            },
+            {
+              "name": "Update Question",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"question_text\": \"What is the exact speed of light in vacuum?\",\n  \"explanation\": \"The speed of light in vacuum is exactly 299,792,458 meters per second, as defined by the International System of Units since 1983.\",\n  \"difficulty\": \"hard\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/questions/{{question_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "questions",
+                    "{{question_id}}"
+                  ]
+                },
+                "description": "Update an existing question."
+              }
+            },
+            {
+              "name": "Delete Question",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/questions/{{question_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "questions",
+                    "{{question_id}}"
+                  ]
+                },
+                "description": "Delete a question. This will also remove it from any schedules."
+              }
+            }
+          ],
+          "description": "Admin endpoints for managing questions"
+        },
+        {
+          "name": "Schedule Management",
+          "item": [
+            {
+              "name": "View Schedule",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/schedule?start_date={{start_date}}&end_date={{end_date}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "schedule"
+                  ],
+                  "query": [
+                    {
+                      "key": "start_date",
+                      "value": "{{start_date}}",
+                      "description": "Start date for schedule view (YYYY-MM-DD)"
+                    },
+                    {
+                      "key": "end_date",
+                      "value": "{{end_date}}",
+                      "description": "End date for schedule view (YYYY-MM-DD)"
+                    }
+                  ]
+                },
+                "description": "View the daily question schedule for a date range."
+              }
+            },
+            {
+              "name": "Schedule Question",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"question_id\": 1,\n  \"category_id\": 1,\n  \"scheduled_date\": \"2025-10-15\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/schedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "schedule"
+                  ]
+                },
+                "description": "Schedule a specific question for a specific date and category."
+              }
+            },
+            {
+              "name": "Update Schedule",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"question_id\": 2,\n  \"scheduled_date\": \"2025-10-16\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/schedule/{{schedule_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "schedule",
+                    "{{schedule_id}}"
+                  ]
+                },
+                "description": "Update an existing schedule entry."
+              }
+            },
+            {
+              "name": "Remove from Schedule",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "description": "Admin JWT token required"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/schedule/{{schedule_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "schedule",
+                    "{{schedule_id}}"
+                  ]
+                },
+                "description": "Remove a question from the schedule."
+              }
+            }
+          ],
+          "description": "Admin endpoints for managing question schedules"
+        }
+      ],
+      "description": "Admin-only endpoints requiring elevated JWT permissions",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{jwt_token}}",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set common variables if not present",
+          "if (!pm.variables.get('category_id')) {",
+          "    pm.variables.set('category_id', '1');",
+          "}",
+          "if (!pm.variables.get('question_id')) {",
+          "    pm.variables.set('question_id', '1');",
+          "}",
+          "if (!pm.variables.get('page')) {",
+          "    pm.variables.set('page', '1');",
+          "}",
+          "if (!pm.variables.get('limit')) {",
+          "    pm.variables.set('limit', '20');",
+          "}",
+          "if (!pm.variables.get('category_slug')) {",
+          "    pm.variables.set('category_slug', 'science');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test for response time",
+          "pm.test(\"Response time is reasonable\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Global test for JSON response",
+          "pm.test(\"Response is JSON\", function () {",
+          "    pm.response.to.have.header('content-type');",
+          "    pm.expect(pm.response.headers.get('content-type')).to.include('application/json');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "category_id",
+      "value": "1",
+      "type": "string",
+      "description": "Default category ID for testing"
+    },
+    {
+      "key": "question_id",
+      "value": "1",
+      "type": "string",
+      "description": "Default question ID for testing"
+    },
+    {
+      "key": "schedule_id",
+      "value": "1",
+      "type": "string",
+      "description": "Default schedule ID for testing"
+    },
+    {
+      "key": "category_slug",
+      "value": "science",
+      "type": "string",
+      "description": "Default category slug for testing"
+    },
+    {
+      "key": "page",
+      "value": "1",
+      "type": "string",
+      "description": "Default page number for pagination"
+    },
+    {
+      "key": "limit",
+      "value": "20",
+      "type": "string",
+      "description": "Default page size for pagination"
+    }
+  ]
+}

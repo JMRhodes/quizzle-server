@@ -20,11 +20,11 @@ export const categoriesService = {
       throw new Error("Failed to fetch categories", { cause: error });
     }
   },
-  getCategoryById: async (id: number, c: Context<Environment>): Promise<z.infer<typeof selectCategorySchema> | null> => {
+  getCategoryById: async (id: number, c: Context<Environment>): Promise<z.infer<typeof selectCategorySchema>> => {
     const db = initDbConnect(c.env.QUIZZLE_DB);
     const result = await db.select().from(categoriesTable).where(eq(categoriesTable.id, id)).limit(1);
 
-    return result[0] || null;
+    return result[0];
   },
   createCategory: async (categoryData: z.infer<typeof insertCategorySchema>, c: Context<Environment>) => {
     const db = initDbConnect(c.env.QUIZZLE_DB);
