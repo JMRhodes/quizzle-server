@@ -1,9 +1,11 @@
 import { Hono } from "hono";
 import { pinoLogger } from "hono-pino";
+import { showRoutes } from "hono/dev";
 
 import type { Environment } from "./bindings";
 
 import categories from "./categories/categories.controller";
+import health from "./health/health.controller";
 import jwtMiddleware from "./middlewares/jwt";
 import { rateLimiter } from "./middlewares/rate-limiter";
 import questions from "./questions/questions.controller";
@@ -23,7 +25,12 @@ app
     }
     return c.json({ message: "Welcome to the API" });
   })
+  .route("/health", health)
   .route("/categories", categories)
   .route("/admin/questions", questions);
+
+showRoutes(app, {
+  verbose: false,
+});
 
 export default app;
