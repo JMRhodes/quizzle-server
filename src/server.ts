@@ -15,7 +15,16 @@ const app = new Hono<Environment>().basePath("/api");
 app
   .use(jwtMiddleware) // Apply JWT authentication middleware
   .use(pinoLogger()) // Log all requests
-  .use(rateLimiter); // Apply rate limiting middleware
+  .use(rateLimiter) // Apply rate limiting middleware
+  .use(async (c, next) => {
+    if (c.env.NODE_ENV === "development") {
+      const { logger } = c.var;
+      logger.debug(c.env);
+      showRoutes(app);
+    }
+
+    await next();
+  });
 
 app
   .get("/", async (c) => {
@@ -28,9 +37,5 @@ app
   .route("/health", health)
   .route("/categories", categories)
   .route("/admin/questions", questions);
-
-showRoutes(app, {
-  verbose: false,
-});
 
 export default app;
