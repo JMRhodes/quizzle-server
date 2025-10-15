@@ -2,6 +2,7 @@ import type { Context } from "hono";
 
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import type { Environment, jsonApiErrorResponse, jsonApiListResponse } from "../bindings";
 
@@ -9,9 +10,24 @@ import { insertQuestionSchema, updateQuestionSchema } from "../db/schema/questio
 import { questionsService } from "./questions.service";
 
 const questions = new Hono<Environment>();
+const categoryIdSchema = z.object({
+  categoryId: z.string(),
+});
 
 questions.get("/", async (c: Context<Environment>) => {
   const results = await questionsService.getAllQuestions(c);
+
+  return c.json({
+    data: results.map(question => ({
+      type: "questions",
+      id: question.id,
+      attributes: { ...question, id: undefined },
+    })),
+  } as jsonApiListResponse);
+});
+
+questions.get("/category/:categoryId", zValidator("param", categoryIdSchema), async (c) => {
+  const results = await questionsService.getQuestionsByCategory(Number.parseInt(c.req.param("categoryId")), c);
 
   return c.json({
     data: results.map(question => ({

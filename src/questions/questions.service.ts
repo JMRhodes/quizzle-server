@@ -11,14 +11,14 @@ import { questions as questionsTable } from "../db/schema/questions";
 
 export const questionsService = {
   getAllQuestions: async (c: Context<Environment>): Promise<z.infer<typeof selectQuestionSchema>[]> => {
-    try {
-      const db = initDbConnect(c.env.QUIZZLE_DB);
-      const result = await db.select().from(questionsTable);
-      return result as z.infer<typeof selectQuestionSchema>[];
-    }
-    catch (error) {
-      throw new Error("Failed to fetch questions", { cause: error });
-    }
+    const db = initDbConnect(c.env.QUIZZLE_DB);
+    const results = await db.select().from(questionsTable);
+    return results as z.infer<typeof selectQuestionSchema>[];
+  },
+  getQuestionsByCategory: async (categoryId: number, c: Context<Environment>): Promise<z.infer<typeof selectQuestionSchema>[]> => {
+    const db = initDbConnect(c.env.QUIZZLE_DB);
+    const results = await db.select().from(questionsTable).where(eq(questionsTable.categoryId, categoryId));
+    return results as z.infer<typeof selectQuestionSchema>[];
   },
   createQuestion: async (questionData: z.infer<typeof insertQuestionSchema>, c: Context<Environment>) => {
     const db = initDbConnect(c.env.QUIZZLE_DB);
