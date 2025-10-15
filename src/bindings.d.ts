@@ -32,7 +32,7 @@ type jsonApiListResponse = {
 
 type jsonApiErrorResponse = {
   id: string;
-  status: string;
+  status: number;
   errors: { detail: string }[];
   meta?: Record<string, unknown>;
 };

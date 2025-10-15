@@ -21,33 +21,28 @@ export const questionsService = {
     }
   },
   createQuestion: async (questionData: z.infer<typeof insertQuestionSchema>, c: Context<Environment>) => {
-    try {
-      const db = initDbConnect(c.env.QUIZZLE_DB);
-      const response = await db.insert(questionsTable).values(questionData);
-      return response;
+    const db = initDbConnect(c.env.QUIZZLE_DB);
+    const response = await db.insert(questionsTable).values(questionData);
+    if (!response.meta.changes) {
+      throw new Error("Failed to create question", { cause: response });
     }
-    catch (error) {
-      throw new Error("Failed to create question", { cause: error });
-    }
+    return response;
   },
   updateQuestion: async (id: number, questionData: z.infer<typeof updateQuestionSchema>, c: Context<Environment>) => {
-    try {
-      const db = initDbConnect(c.env.QUIZZLE_DB);
-      const response = await db.update(questionsTable).set(questionData).where(eq(questionsTable.id, id));
-      return response;
+    const db = initDbConnect(c.env.QUIZZLE_DB);
+    const response = await db.update(questionsTable).set(questionData).where(eq(questionsTable.id, id));
+    if (!response.meta.changes) {
+      throw new Error("Failed to update question", { cause: response });
     }
-    catch (error) {
-      throw new Error("Failed to update question", { cause: error });
-    }
+    return response;
   },
   deleteQuestion: async (id: number, c: Context<Environment>) => {
-    try {
-      const db = initDbConnect(c.env.QUIZZLE_DB);
-      const response = await db.delete(questionsTable).where(eq(questionsTable.id, id));
-      return response;
+    const db = initDbConnect(c.env.QUIZZLE_DB);
+    const response = await db.delete(questionsTable).where(eq(questionsTable.id, id));
+    if (!response.meta.changes) {
+      throw new Error("Failed to delete question", { cause: response });
     }
-    catch (error) {
-      throw new Error("Failed to delete question", { cause: error });
-    }
+
+    return response;
   },
 };

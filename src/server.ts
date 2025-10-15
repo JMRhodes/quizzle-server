@@ -36,6 +36,6 @@ app
   })
   .route("/health", health)
   .route("/categories", categories)
-  .route("/admin/questions", questions);
+  .route("/questions", questions);
 
 export default app;

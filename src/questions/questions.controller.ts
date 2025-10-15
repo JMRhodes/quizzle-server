@@ -3,7 +3,7 @@ import type { Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-import type { Environment, jsonApiListResponse } from "../bindings";
+import type { Environment, jsonApiErrorResponse, jsonApiListResponse } from "../bindings";
 
 import { insertQuestionSchema, updateQuestionSchema } from "../db/schema/questions";
 import { questionsService } from "./questions.service";
@@ -23,23 +23,56 @@ questions.get("/", async (c: Context<Environment>) => {
 });
 
 questions.post("/", zValidator("json", insertQuestionSchema), async (c) => {
-  const response = await questionsService.createQuestion(c.req.valid("json"), c);
+  try {
+    const response = await questionsService.createQuestion(c.req.valid("json"), c);
 
-  return c.json({ message: "Question created", response });
+    return c.json({ message: "Question created", response });
+  }
+  catch (error) {
+    return c.json({
+      id: "error_creating_record",
+      status: 500,
+      errors: [{
+        detail: error instanceof Error ? error.message : "Unknown Error",
+      }],
+    } as jsonApiErrorResponse, 500);
+  }
 });
 
 questions.put("/:id", zValidator("json", updateQuestionSchema), async (c) => {
   const { id } = c.req.param();
-  const results = await questionsService.updateQuestion(Number.parseInt(id), c.req.valid("json"), c);
+  try {
+    const results = await questionsService.updateQuestion(Number.parseInt(id), c.req.valid("json"), c);
 
-  return c.json({ message: `Updated question with id ${id}`, results });
+    return c.json({ message: `Updated question with id ${id}`, results });
+  }
+  catch (error) {
+    return c.json({
+      id: "error_updating_record",
+      status: 500,
+      errors: [{
+        detail: error instanceof Error ? error.message : "Unknown Error",
+      }],
+    } as jsonApiErrorResponse, 500);
+  }
 });
 
 questions.delete("/:id", async (c) => {
   const { id } = c.req.param();
-  const response = await questionsService.deleteQuestion(Number.parseInt(id), c);
+  try {
+    const response = await questionsService.deleteQuestion(Number.parseInt(id), c);
 
-  return c.json({ message: `Question ${id} deleted`, response });
+    return c.json({ message: `Question ${id} deleted`, response });
+  }
+  catch (error) {
+    return c.json({
+      id: "error_deleting_record",
+      status: 500,
+      errors: [{
+        detail: error instanceof Error ? error.message : "Unknown Error",
+      }],
+    } as jsonApiErrorResponse, 500);
+  }
 });
 
 export default questions;

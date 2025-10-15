@@ -28,7 +28,7 @@ categories.get("/:id", async (c) => {
   if (!result) {
     return c.json({
       id: "not_found",
-      status: "404",
+      status: 404,
       errors: [{ detail: `Category with id ${id} not found` }],
       meta: {},
     } as jsonApiErrorResponse, 404);
