@@ -22,7 +22,7 @@ categories.get("/", withD1, async (c: Context<Environment>) => {
   } as jsonApiListResponse);
 });
 
-categories.get("/:id", async (c) => {
+categories.get("/:id", withD1, async (c) => {
   const { id } = c.req.param();
   const result = await categoriesService.getCategoryById(Number.parseInt(id), c);
 
@@ -44,20 +44,20 @@ categories.get("/:id", async (c) => {
   } as jsonApiResponse);
 });
 
-categories.post("/", zValidator("json", insertCategorySchema), async (c) => {
+categories.post("/", withD1, zValidator("json", insertCategorySchema), async (c) => {
   const response = await categoriesService.createCategory(c.req.valid("json"), c);
 
   return c.json({ message: "Category created", response });
 });
 
-categories.put("/:id", zValidator("json", updateCategorySchema), async (c) => {
+categories.put("/:id", withD1, zValidator("json", updateCategorySchema), async (c) => {
   const { id } = c.req.param();
   const response = await categoriesService.updateCategory(Number.parseInt(id), c.req.valid("json"), c);
 
   return c.json({ message: "Category updated", response });
 });
 
-categories.delete("/:id", async (c) => {
+categories.delete("/:id", withD1, async (c) => {
   const { id } = c.req.param();
   const response = await categoriesService.deleteCategory(Number.parseInt(id), c);
   return c.json({ message: `Category ${id} deleted`, response });

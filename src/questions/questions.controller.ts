@@ -27,7 +27,7 @@ questions.get("/", withD1, async (c: Context<Environment>) => {
   } as jsonApiListResponse);
 });
 
-questions.get("/category/:categoryId", zValidator("param", categoryIdSchema), async (c) => {
+questions.get("/category/:categoryId", withD1, zValidator("param", categoryIdSchema), async (c) => {
   const results = await questionsService.getQuestionsByCategory(Number.parseInt(c.req.param("categoryId")), c);
 
   return c.json({
@@ -39,7 +39,7 @@ questions.get("/category/:categoryId", zValidator("param", categoryIdSchema), as
   } as jsonApiListResponse);
 });
 
-questions.post("/", zValidator("json", insertQuestionSchema), async (c) => {
+questions.post("/", withD1, zValidator("json", insertQuestionSchema), async (c) => {
   try {
     const response = await questionsService.createQuestion(c.req.valid("json"), c);
 
@@ -56,7 +56,7 @@ questions.post("/", zValidator("json", insertQuestionSchema), async (c) => {
   }
 });
 
-questions.put("/:id", zValidator("json", updateQuestionSchema), async (c) => {
+questions.put("/:id", withD1, zValidator("json", updateQuestionSchema), async (c) => {
   const { id } = c.req.param();
   try {
     const results = await questionsService.updateQuestion(Number.parseInt(id), c.req.valid("json"), c);
@@ -74,7 +74,7 @@ questions.put("/:id", zValidator("json", updateQuestionSchema), async (c) => {
   }
 });
 
-questions.delete("/:id", async (c) => {
+questions.delete("/:id", withD1, async (c) => {
   const { id } = c.req.param();
   try {
     const response = await questionsService.deleteQuestion(Number.parseInt(id), c);

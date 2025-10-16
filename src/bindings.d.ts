@@ -2,7 +2,8 @@ import type { Env } from "hono";
 
 type Environment = Env & {
   Variables: {
-    db: DbConnector;
+    db: DrizzleD1Database;
+    test: string;
   };
   Bindings: {
     JWT_SECRET: string;
