@@ -1,6 +1,9 @@
 import type { Env } from "hono";
 
 type Environment = Env & {
+  Variables: {
+    db: DbConnector;
+  };
   Bindings: {
     JWT_SECRET: string;
     USERNAME: string;

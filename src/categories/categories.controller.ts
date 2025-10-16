@@ -5,12 +5,13 @@ import { Hono } from "hono";
 
 import type { Environment, jsonApiErrorResponse, jsonApiListResponse, jsonApiResponse } from "../bindings";
 
+import withD1 from "../db";
 import { insertCategorySchema, updateCategorySchema } from "../db/schema/categories";
 import { categoriesService } from "./categories.service";
 
 const categories = new Hono<Environment>();
 
-categories.get("/", async (c: Context<Environment>) => {
+categories.get("/", withD1, async (c: Context<Environment>) => {
   const results = await categoriesService.getAllCategories(c);
   return c.json({
     data: results.map(category => ({

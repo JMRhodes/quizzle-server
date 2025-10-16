@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import type { Environment, jsonApiErrorResponse, jsonApiListResponse } from "../bindings";
 
+import withD1 from "../db";
 import { insertQuestionSchema, updateQuestionSchema } from "../db/schema/questions";
 import { questionsService } from "./questions.service";
 
@@ -14,7 +15,7 @@ const categoryIdSchema = z.object({
   categoryId: z.string(),
 });
 
-questions.get("/", async (c: Context<Environment>) => {
+questions.get("/", withD1, async (c: Context<Environment>) => {
   const results = await questionsService.getAllQuestions(c);
 
   return c.json({
